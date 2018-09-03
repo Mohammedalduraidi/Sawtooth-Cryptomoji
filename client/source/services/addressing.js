@@ -1,6 +1,5 @@
 import { createHash } from 'crypto';
 
-
 const NAMESPACE = '5f4d76';
 const PREFIXES = {
   COLLECTION: '00',
@@ -8,6 +7,11 @@ const PREFIXES = {
   SIRE_LISTING: '02',
   OFFER: '03'
 };
+
+const hashing = (str) => {
+  return createHash('sha512').update(str).digest('hex');
+};
+
 /**
  * A function which optionally takes a public key, and returns a full or
  * partial collection address.
@@ -26,7 +30,12 @@ const PREFIXES = {
  */
 export const getCollectionAddress = (publicKey = null) => {
   // Enter your solution here
-
+  var address = NAMESPACE + PREFIXES['COLLECTION'];
+  if (publicKey === null) {
+    return address;
+  }
+  var hashed = hashing(publicKey);
+  return address+hashed.slice(0, 62);  
 };
 
 /**
@@ -43,7 +52,18 @@ export const getCollectionAddress = (publicKey = null) => {
  */
 export const getMojiAddress = (ownerKey = null, dna = null) => {
   // Your code here
-
+  var address = NAMESPACE + PREFIXES['MOJI'];
+  if (ownerKey === null && dna === null) {
+    return address;
+  }
+  var hashed = hashing(ownerKey);
+  // if (dna === null) {
+  hashed = hashed.slice(0, 8);
+  // return address + hashed;
+  if (dna !== null ) {
+    hashed += hashing(dna).slice(0, 54);
+  }
+  return address + hashed; 
 };
 
 /**
@@ -55,7 +75,17 @@ export const getMojiAddress = (ownerKey = null, dna = null) => {
  */
 export const getSireAddress = (ownerKey = null) => {
   // Your code here
+  var address = NAMESPACE + PREFIXES['SIRE_LISTING'];
+  if (ownerKey === null) {
+    return address;
+  }
+  return address + hashing(ownerKey).slice(0,62);
 
+};
+
+const checkIfMogiAddress = ( ownerKey, address) => {
+  let mojiAdrsPrefix = getMojiAddress(ownerKey);
+  return mojiAdrsPrefix === address.slice(0, 16);
 };
 
 /**
@@ -72,5 +102,25 @@ export const getSireAddress = (ownerKey = null) => {
  */
 export const getOfferAddress = (ownerKey = null, moji = null) => {
   // Your code here
+  var offerAddress = NAMESPACE + PREFIXES['OFFER'];
+  if (ownerKey === null && moji === null) {
+    return offerAddress;
+  }
 
+  offerAddress += hashing(ownerKey).slice(0, 8);
+
+  if (moji !== null) {
+    if (typeof(moji) !== 'object') {
+      if (checkIfMogiAddress(ownerKey, moji) === false) {
+        moji = getMojiAddress(ownerKey, moji);
+      }
+      offerAddress += hashing(moji).slice(0, 54);
+    } else {
+      // sort & join mogi addresses
+      var joined = moji.sort().join('');
+      offerAddress += hashing(joined).slice(0, 54);
+    }
+  }
+
+  return offerAddress;
 };

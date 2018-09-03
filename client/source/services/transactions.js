@@ -3,7 +3,8 @@ import {
   TransactionHeader,
   Batch,
   BatchHeader,
-  BatchList
+  BatchList,
+  CryptoFactory
 } from 'sawtooth-sdk/protobuf';
 import { createHash } from 'crypto';
 import { getPublicKey, sign } from './signing.js';
@@ -29,6 +30,25 @@ const NAMESPACE = '5f4d76';
  */
 export const createTransaction = (privateKey, payload) => {
   // Enter your solution here
+  const encodedPayload = encode(payload);
+   
+  const header = TransactionHeader.encode({
+    familyName: FAMILY_NAME,
+    familyVersion: FAMILY_VERSION,
+    signerPublicKey: getPublicKey(privateKey),
+    batcherPublicKey: getPublicKey(privateKey),
+    //inputs: [address],
+    // outputs: [address],
+    dependencies: [],
+    payloadSha512: sign(privateKey,encodedPayload)
+  }).finish();
+  return Transaction.create({
+    header,
+    headerSignature: sign(privateKey, header),
+    payload: encodedPayload
+  });
+
+
 
 };
 
