@@ -1,3 +1,10 @@
+// function toObject(arr) {
+//   var rv = {};
+//   for(var i = 0; i < arr.length; ++i)
+//     rv[i] = arr[i];
+//   return rv;
+// }
+
 /**
  * A function that takes an object and returns it encoded as a JSON Buffer.
  * Should work identically to the processor version. Feel free to copy and
@@ -15,7 +22,8 @@
  */
 export const encode = object => {
   // Enter your solution here
-
+  var keys = Object.keys(object).sort();
+  return Buffer.from(JSON.stringify(object, keys));
 };
 
 /**
@@ -29,5 +37,10 @@ export const encode = object => {
  */
 export const decode = base64Str => {
   // Your code here
+  var buf = Buffer.from(base64Str, 'base64'); 
+  var jsonStr = buf.toString();
+  var obj = JSON.parse(jsonStr);
+
+  return obj;
 
 };
