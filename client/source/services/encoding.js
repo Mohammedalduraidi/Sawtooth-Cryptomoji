@@ -15,7 +15,12 @@
  */
 export const encode = object => {
   // Enter your solution here
-
+  const alo = Object.keys(object).sort();
+  const jackel = JSON.stringify(object, alo);
+  // console.log("hello world", jackel)
+  var a = Buffer.from(jackel);
+  // console.log("my name is jeff", a)
+  return a
 };
 
 /**
@@ -28,6 +33,23 @@ export const encode = object => {
  *   base64 string -> Buffer -> JSON string -> object
  */
 export const decode = base64Str => {
-  // Your code here
+  // var binary_string =  window.atob(base64Str);
+  //     var len = binary_string.length;
+  //     var bytes = new Uint8Array( len );
+  //     for (var i = 0; i < len; i++)        {
+  //         bytes[i] = binary_string.charCodeAt(i);
+  //     }
 
+  //  var x = bytes.buffer
+  //     var a = x.toString()
+  //     var obj = JSON.parse(a)
+  //     return obj
+
+    //  console.log("hello jhahs",jasonObject);
+    //  return JSON.parse(jasonObject);
+
+  const buf = Buffer.from(base64Str, 'base64');
+  const jsonStr = buf.toString();
+  const obj = JSON.parse(jsonStr);
+  return obj;
 };

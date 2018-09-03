@@ -44,11 +44,12 @@ export const getPublicKey = privateKey => {
  *   // }
  */
 export const createKeys = () => {
-  // Your code here
-  // return secp256k1.verify(
-  //   toBytes(signature),
-  //   toBytes(publicKey)
-  // );
+
+  var a = createPrivateKey();
+  var b = getPublicKey(a);
+  var y = {privateKey:a, publicKey:b}
+  return y
+
 };
 
 /**
