@@ -44,10 +44,12 @@ export const getPublicKey = privateKey => {
  *   // }
  */
 export const createKeys = () => {
+
   var a = createPrivateKey();
   var b = getPublicKey(a);
   var y = {privateKey:a, publicKey:b}
   return y
+
 };
 
 /**
