@@ -31,16 +31,17 @@ const NAMESPACE = '5f4d76';
 export const createTransaction = (privateKey, payload) => {
   // Enter your solution here
   const encodedPayload = encode(payload);
-   
+  const publicKey = getPublicKey(privateKey);
+  
   const header = TransactionHeader.encode({
     familyName: FAMILY_NAME,
     familyVersion: FAMILY_VERSION,
-    signerPublicKey: getPublicKey(privateKey),
-    batcherPublicKey: getPublicKey(privateKey),
-    //inputs: [address],
-    // outputs: [address],
+    signerPublicKey: publicKey,
+    batcherPublicKey: publicKey,
+    inputs: [NAMESPACE],
+    outputs: [NAMESPACE],
     dependencies: [],
-    payloadSha512: sign(privateKey,encodedPayload)
+    payloadSha512: sign(privateKey, encodedPayload)
   }).finish();
   return Transaction.create({
     header,

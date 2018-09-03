@@ -65,5 +65,4 @@ export const sign = (privateKey, message) => {
 
   let signature = secp256k1.sign(hash, buf);
   return signature.signature.toString("hex");
-
 };
