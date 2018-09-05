@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 
 
+
 import { createKeys } from "./signing"
 // const sha256 = msg => createHash('sha256').update(msg).digest();
 
@@ -12,6 +13,7 @@ const PREFIXES = {
   SIRE_LISTING: '02',
   OFFER: '03'
 };
+
 const ADDRESS_LENGTH = 70;
 const FULL_PREFIXES = Object.keys(PREFIXES).reduce((prefixes, key) => {
   prefixes[key] = NAMESPACE + PREFIXES[key];
@@ -31,6 +33,7 @@ export const addressToType = (address = '') => {
     .find(type => FULL_PREFIXES[type] === address.slice(0, 8));
 
   return type || null;
+
 };
 
 /**
@@ -51,11 +54,13 @@ export const addressToType = (address = '') => {
  */
 export const getCollectionAddress = (publicKey = null) => {
 
+
   if (publicKey === null) {
     return FULL_PREFIXES.COLLECTION;
   }
 
   return FULL_PREFIXES.COLLECTION + hash(publicKey, 62);
+
 
 };
 
@@ -72,6 +77,7 @@ export const getCollectionAddress = (publicKey = null) => {
  *   console.log(ownerPrefix);  // '5f4d7601ecd7ef45'
  */
 export const getMojiAddress = (ownerKey = null, dna = null) => {
+
   if (ownerKey === null) {
     return FULL_PREFIXES.MOJI;
   }
@@ -82,6 +88,7 @@ export const getMojiAddress = (ownerKey = null, dna = null) => {
   }
 
   return ownerPrefix + hash(dna, 54);
+
 };
 
 /**
@@ -92,11 +99,21 @@ export const getMojiAddress = (ownerKey = null, dna = null) => {
  * otherwise returns the full address.
  */
 export const getSireAddress = (ownerKey = null) => {
+
+  // Your code here
+  var address = NAMESPACE + PREFIXES['SIRE_LISTING'];
   if (ownerKey === null) {
-    return FULL_PREFIXES.SIRE_LISTING;
+    return address;
   }
+  return address + hashing(ownerKey).slice(0,62);
+
 
   return FULL_PREFIXES.SIRE_LISTING + hash(ownerKey, 62);
+};
+
+const checkIfMogiAddress = ( ownerKey, address) => {
+  let mojiAdrsPrefix = getMojiAddress(ownerKey);
+  return mojiAdrsPrefix === address.slice(0, 16);
 };
 
 /**
@@ -112,26 +129,28 @@ export const getSireAddress = (ownerKey = null) => {
  * The identifiers may be either moji dna, or moji addresses.
  */
 export const getOfferAddress = (ownerKey = null, moji = null) => {
-  if (ownerKey === null) {
-    return FULL_PREFIXES.OFFER;
+
+  // Your code here
+  var offerAddress = NAMESPACE + PREFIXES['OFFER'];
+  if (ownerKey === null && moji === null) {
+    return offerAddress;
   }
 
-  const ownerPrefix = FULL_PREFIXES.OFFER + hash(ownerKey, 8);
-  if (moji === null) {
-    return ownerPrefix;
-  }
+  offerAddress += hashing(ownerKey).slice(0, 8);
 
-  if (!Array.isArray(moji)) {
-    moji = [moji];
-  }
-
-  const addresses = moji.map(addressOrDna => {
-    if (addressOrDna.length === ADDRESS_LENGTH) {
-      return addressOrDna;
+  if (moji !== null) {
+    if (typeof(moji) !== 'object') {
+      if (checkIfMogiAddress(ownerKey, moji) === false) {
+        moji = getMojiAddress(ownerKey, moji);
+      }
+      offerAddress += hashing(moji).slice(0, 54);
+    } else {
+      // sort & join mogi addresses
+      var joined = moji.sort().join('');
+      offerAddress += hashing(joined).slice(0, 54);
     }
+  }
 
-    return getMojiAddress(ownerKey, addressOrDna);
-  });
+  return offerAddress;
 
-  return ownerPrefix + hash(addresses.sort().join(''), 54);
 };
