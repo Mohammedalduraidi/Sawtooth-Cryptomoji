@@ -8,8 +8,7 @@ const { getPrng } = require('./services/prng')
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
 const NAMESPACE = '5f4d76';
-const test = '1234567891123456789112345678911234567891123456789112345678911234567891'
-
+const emptyArray = size => Array.apply(null, Array(size));
 /**
  * A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
  */
@@ -48,23 +47,52 @@ class MojiHandler extends TransactionHandler {
    *     array of state addresses. Only needed if attempting the extra credit.
    */
 
+  makeDna(dna) {
+    return emptyArray(9).map(() => {
+      const randomHex = dna(GENE_SIZE).toString(16);
+      return ('0000' + randomHex).slice(-4);
+    }).join('');
+  }
   makeMoji(publicKey, prng) {
-    const mojyArray = [] // should create empty eremoji
-  };
+    return emptyArray(3).map(() => ({
+      dna: this.makeDna(prng),
+      owner: publicKey,
+      sire: null,
+      breeder: null,
+      sired: [],
+      bred: []
+    }));
+  }
+  createThreeMoji(signerPublicKey) {
+    const emojiArray = [];
+    for (let i = 0; i < 3; i++) {
+      // console.log('jackel is here ', dna);
+      const alo = this.makeDna(getPrng(signerPublicKey));
+      emojiArray.push(getMojiAddress(signerPublicKey, alo));
+    }
+    return emojiArray;
+  }
 
-  createCollection(context, publickKey, signerPublicKey) {
-    const address = getCollectionAddress(publickKey);
-    const emojiAderess = getMojiAddress(address, getPrng(parseInt(signerPublicKey)))
-    console.log(address)
+
+  createCollection(context, publicKey, signerPublicKey) {
+    const address = getCollectionAddress(publicKey);
+    const prng = getPrng(signerPublicKey);
     return context.getState([address]).then(state => {
       if (state[address].length > 0) {
         throw new InvalidTransaction('Owner already exists');
       }
       const update = {};
-      update[address] = encode({ key: publickKey, moji: [test, "112", "12"] });
-      console.log('ahelellooo worl', update)
-      // update[address]
-      //create 3 mojii // moji array
+      const mojiAddress = [];
+      const moji = this.makeMoji(publicKey, prng);
+      moji.forEach(moji => {
+        const address = getMojiAddress(publicKey, moji.dna);
+        update[address] = encode(moji);
+        mojiAddress.push(address);
+      })
+      update[address] = encode({
+        key: publicKey,
+        moji: mojiAddress.sort()
+      });
       return context.setState(update);
     });
   }
