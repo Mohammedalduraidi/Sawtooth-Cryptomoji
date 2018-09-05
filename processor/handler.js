@@ -3,7 +3,7 @@
 const { TransactionHandler } = require('sawtooth-sdk/processor/handler');
 const { InvalidTransaction } = require('sawtooth-sdk/processor/exceptions');
 const { decode, encode } = require('./services/encoding');
-const { getCollectionAddress, getMojiAddress } = require('./services/addressing')
+const { getCollectionAddress, getMojiAddress, getSireAddress } = require('./services/addressing')
 const { getPrng } = require('./services/prng')
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
@@ -47,19 +47,21 @@ class MojiHandler extends TransactionHandler {
    *   - context.deleteState(addresses): deletes the state for the passed
    *     array of state addresses. Only needed if attempting the extra credit.
    */
-  createThreeMoji() {
 
-  }
-  createCollection(context, payload , signerPublicKey) {
-    const address = getCollectionAddress(signerPublicKey);
-    const emojiAderess= getMojiAddress(address, getPrng(parseInt(signerPublicKey)))
+  makeMoji(publicKey, prng) {
+    const mojyArray = [] // should create empty eremoji
+  };
+
+  createCollection(context, publickKey, signerPublicKey) {
+    const address = getCollectionAddress(publickKey);
+    const emojiAderess = getMojiAddress(address, getPrng(parseInt(signerPublicKey)))
     console.log(address)
     return context.getState([address]).then(state => {
       if (state[address].length > 0) {
         throw new InvalidTransaction('Owner already exists');
       }
       const update = {};
-      update[address] = encode({ key: signerPublicKey, moji: [test, "112", "12"] });
+      update[address] = encode({ key: publickKey, moji: [test, "112", "12"] });
       console.log('ahelellooo worl', update)
       // update[address]
       //create 3 mojii // moji array
@@ -68,6 +70,17 @@ class MojiHandler extends TransactionHandler {
   }
 
 
+  // createOwner(context, { name }, ownerPublicKey) {
+  //   const address = getSireAddress(ownerKey);
+  //   return context.getState([address]).then(state => {
+  //     if (state[address].length > 0) {
+  //       throw new InvalidTransaction('Owner already exist');
+  //     }
+  //     const update = {};
+  //     update[address] = encode({ key: ownerPublicKey, name });
+  //     return context.setState(update);
+  //   });
+  // }
 
 
   apply(txn, context) {
@@ -81,14 +94,12 @@ class MojiHandler extends TransactionHandler {
     if (payload.action === 'CREATE_COLLECTION') {
       return this.createCollection(context, payload, txn.header.signerPublicKey);
     }
+    // else if (payload.action === 'CREATE_OWNER') {
+    //   return createOwner(context, payload, txn.header.signerPublicKey);
+    // }
 
-    throw new InvalidTransaction('Unknown action');
+    throw new InvalidTransaction(' Unknown action <3');
   }
-
-  // Enter your solution here
-  // (start by decoding your payload and checking which action it has)
-
-
 }
 
 module.exports = MojiHandler;
