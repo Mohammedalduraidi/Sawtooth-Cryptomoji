@@ -67,7 +67,7 @@ class MojiHandler extends TransactionHandler {
   createThreeMoji(signerPublicKey) {
     const emojiArray = [];
     for (let i = 0; i < 3; i++) {
-      // console.log('jackel is here ', dna);
+    // console.log('jackel is here ', this.makeDna(getPrng(signerPublicKey)));
       const alo = this.makeDna(getPrng(signerPublicKey));
       emojiArray.push(getMojiAddress(signerPublicKey, alo));
     }
