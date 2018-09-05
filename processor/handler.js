@@ -8,6 +8,7 @@ const { getPrng } = require('./services/prng')
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
 const NAMESPACE = '5f4d76';
+const test = '1234567891123456789112345678911234567891123456789112345678911234567891'
 
 /**
  * A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
@@ -47,19 +48,18 @@ class MojiHandler extends TransactionHandler {
    *     array of state addresses. Only needed if attempting the extra credit.
    */
   createThreeMoji() {
-    
-  }
 
-  createCollection(context, { name }, signerPublicKey) {
+  }
+  createCollection(context, payload , signerPublicKey) {
     const address = getCollectionAddress(signerPublicKey);
-    // const emojiAderess= getMojiAddress(address, getPrng(nmber))
+    const emojiAderess= getMojiAddress(address, getPrng(parseInt(signerPublicKey)))
     console.log(address)
     return context.getState([address]).then(state => {
       if (state[address].length > 0) {
         throw new InvalidTransaction('Owner already exists');
       }
       const update = {};
-      update[address] = encode({ key: signerPublicKey,moji:[name] });
+      update[address] = encode({ key: signerPublicKey, moji: [test, "112", "12"] });
       console.log('ahelellooo worl', update)
       // update[address]
       //create 3 mojii // moji array

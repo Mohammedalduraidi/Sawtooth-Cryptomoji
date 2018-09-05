@@ -1,6 +1,10 @@
 import { createHash } from 'crypto';
 
 
+import { createKeys } from "./signing"
+// const sha256 = msg => createHash('sha256').update(msg).digest();
+
+
 const NAMESPACE = '5f4d76';
 const PREFIXES = {
   COLLECTION: '00',
@@ -46,11 +50,13 @@ export const addressToType = (address = '') => {
  *   // '5f4d7600ecd7ef459ec82a01211983551c3ed82169ca5fa0703ec98e17f9b534ffb797'
  */
 export const getCollectionAddress = (publicKey = null) => {
+
   if (publicKey === null) {
     return FULL_PREFIXES.COLLECTION;
   }
 
   return FULL_PREFIXES.COLLECTION + hash(publicKey, 62);
+
 };
 
 /**
