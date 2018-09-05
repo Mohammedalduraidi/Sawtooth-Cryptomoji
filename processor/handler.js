@@ -8,6 +8,7 @@ const { getPrng } = require('./services/prng')
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
 const NAMESPACE = '5f4d76';
+const GENE_SIZE = 2 ** (2 * 8);
 const emptyArray = size => Array.apply(null, Array(size));
 /**
  * A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
