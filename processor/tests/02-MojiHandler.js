@@ -23,7 +23,7 @@ describe('Core MojiHandler Behavior', function() {
   it('should return a Promise', function() {
     const txn = new Txn({ hello: 'world' });
     const applyResult = handler.apply(txn, context);
-
+    console.log(applyResult);
     expect(applyResult).to.be.an.instanceOf(Promise);
     applyResult.catch(() => {});
   });

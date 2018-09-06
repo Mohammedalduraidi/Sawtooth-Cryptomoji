@@ -55,6 +55,7 @@ export const addressToType = (address = '') => {
 export const getCollectionAddress = (publicKey = null) => {
 
 
+
   if (publicKey === null) {
     return FULL_PREFIXES.COLLECTION;
   }
@@ -62,6 +63,8 @@ export const getCollectionAddress = (publicKey = null) => {
   return FULL_PREFIXES.COLLECTION + hash(publicKey, 62);
 
 
+
+  return FULL_PREFIXES.COLLECTION + hash(publicKey, 62);
 };
 
 /**
@@ -87,8 +90,8 @@ export const getMojiAddress = (ownerKey = null, dna = null) => {
     return ownerPrefix;
   }
 
-  return ownerPrefix + hash(dna, 54);
 
+  return ownerPrefix + hash(dna, 54);
 };
 
 /**
@@ -100,20 +103,12 @@ export const getMojiAddress = (ownerKey = null, dna = null) => {
  */
 export const getSireAddress = (ownerKey = null) => {
 
-  // Your code here
-  var address = NAMESPACE + PREFIXES['SIRE_LISTING'];
   if (ownerKey === null) {
-    return address;
+    return FULL_PREFIXES.SIRE_LISTING;
   }
-  return address + hashing(ownerKey).slice(0,62);
-
 
   return FULL_PREFIXES.SIRE_LISTING + hash(ownerKey, 62);
-};
 
-const checkIfMogiAddress = ( ownerKey, address) => {
-  let mojiAdrsPrefix = getMojiAddress(ownerKey);
-  return mojiAdrsPrefix === address.slice(0, 16);
 };
 
 /**
@@ -129,6 +124,7 @@ const checkIfMogiAddress = ( ownerKey, address) => {
  * The identifiers may be either moji dna, or moji addresses.
  */
 export const getOfferAddress = (ownerKey = null, moji = null) => {
+
 
   // Your code here
   var offerAddress = NAMESPACE + PREFIXES['OFFER'];
@@ -154,3 +150,4 @@ export const getOfferAddress = (ownerKey = null, moji = null) => {
   return offerAddress;
 
 };
+

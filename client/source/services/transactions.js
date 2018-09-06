@@ -113,8 +113,10 @@ export const encodeAll = (privateKey, payloads) => {
     payloads = [ payloads ];
   }
 
+
   const transactions = payloads.map(p => createTransaction(privateKey, p));
   const batch = createBatch(privateKey, transactions);
 
   return encodeBatches(batch);
 };
+

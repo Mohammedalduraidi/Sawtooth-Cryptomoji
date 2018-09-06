@@ -3,16 +3,19 @@
 const { TransactionHandler } = require('sawtooth-sdk/processor/handler');
 const { InvalidTransaction } = require('sawtooth-sdk/processor/exceptions');
 const { decode, encode } = require('./services/encoding');
-const { getCollectionAddress, getMojiAddress, getSireAddress } = require('./services/addressing')
-const { getPrng } = require('./services/prng')
+
+const { getCollectionAddress, getMojiAddress } = require('./services/addressing')
+const getPrng = require('./services/prng');
+
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
 const NAMESPACE = '5f4d76';
 const GENE_SIZE = 2 ** (2 * 8);
 const emptyArray = size => Array.apply(null, Array(size));
+
 /**
- * A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
- */
+* A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
+*/
 class MojiHandler extends TransactionHandler {
   /**
    * The constructor for a TransactionHandler simply registers it with the
@@ -54,6 +57,7 @@ class MojiHandler extends TransactionHandler {
       return ('0000' + randomHex).slice(-4);
     }).join('');
   }
+
   makeMoji(publicKey, prng) {
     return emptyArray(3).map(() => ({
       dna: this.makeDna(prng),
@@ -64,36 +68,67 @@ class MojiHandler extends TransactionHandler {
       bred: []
     }));
   }
-  createThreeMoji(signerPublicKey) {
-    const emojiArray = [];
-    for (let i = 0; i < 3; i++) {
-    // console.log('jackel is here ', this.makeDna(getPrng(signerPublicKey)));
-      const alo = this.makeDna(getPrng(signerPublicKey));
-      emojiArray.push(getMojiAddress(signerPublicKey, alo));
+
+
+  // createThreeMoji(signerPublicKey) {
+  //   var arr = [];
+  //   for (var i = 0; i < 3; i++) {
+  //     // var dna = getPrng(signerPublicKey);
+  //     // console.log('dna ', dna);
+  //     var r = this.makeDna(getPrng(signerPublicKey));
+  //     arr.push(getMojiAddress(signerPublicKey,r));
+  //   }
+  //   return arr;
+
+  //   // col.mogi.push('asd')
+
+  //   // console.log(col);
+  //   // moji = {
+  //   //   "dna": "<hex string>",
+  //   //   "owner": owner,
+  //   //   "breeder": "<string, moji address>",
+  //   //   "sire": "<string, moji address>",
+  //   //   "bred": ["<strings, moji addresses>"],
+  //   //   "sired": ["<strings, moji addresses>"]
+  //   // };
+  // }
+  each(array, callback) {
+    for (var i = 0; i < array.length; i++) {
+      callback(array[i]);
     }
-    return emojiArray;
   }
-
-
   createCollection(context, publicKey, signerPublicKey) {
+
     const address = getCollectionAddress(publicKey);
+    console.log('signerPublicKey ', signerPublicKey);
     const prng = getPrng(signerPublicKey);
     return context.getState([address]).then(state => {
       if (state[address].length > 0) {
-        throw new InvalidTransaction('Owner already exists');
+        throw new InvalidTransaction('collection already exists');
       }
+      // console.log('weired function ___',this.makeDna(prng));
+
       const update = {};
       const mojiAddress = [];
       const moji = this.makeMoji(publicKey, prng);
-      moji.forEach(moji => {
+      this.each(moji, (moji) => {
         const address = getMojiAddress(publicKey, moji.dna);
         update[address] = encode(moji);
         mojiAddress.push(address);
-      })
+      });
+      // moji.forEach(moji => {
+      //   const address = getMojiAddress(publicKey, moji.dna);
+      //   update[address] = encode(moji);
+      //   mojiAddress.push(address);
+      // });
+
+
+
       update[address] = encode({
         key: publicKey,
         moji: mojiAddress.sort()
       });
+
       return context.setState(update);
     });
   }
@@ -128,7 +163,15 @@ class MojiHandler extends TransactionHandler {
     // }
 
     throw new InvalidTransaction(' Unknown action <3');
+
   }
+
+
+
+
+
+
+  
 }
 
 module.exports = MojiHandler;

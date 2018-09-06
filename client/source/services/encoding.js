@@ -1,3 +1,26 @@
+// Maps over an array with a provided iterator function,
+// concatenating the resulting arrays
+const concatMap = (array, iterator) => {
+  return array.reduce((mapped, item) => {
+    return mapped.concat(iterator(item));
+  }, []);
+};
+
+// Recursively fetches all of the keys in nested objects
+const listKeys = object => {
+  if (!object || typeof object !== 'object') {
+    return [];
+  }
+
+  if (Array.isArray(object)) {
+    return concatMap(object, item => listKeys(item));
+  }
+
+  const topKeys = Object.keys(object);
+  const nestedKeys = concatMap(topKeys, key => listKeys(object[key]));
+  return topKeys.concat(nestedKeys);
+};
+
 /**
  * A function that takes an object and returns it encoded as a JSON Buffer.
  * Should work identically to the processor version. Feel free to copy and
@@ -14,6 +37,7 @@
  *   your object's keys or random transactions may fail.
  */
 export const encode = object => {
+
   // Enter your solution here
   const alo = Object.keys(object).sort();
   const jackel = JSON.stringify(object, alo);
@@ -21,6 +45,7 @@ export const encode = object => {
   var a = Buffer.from(jackel);
   // console.log("my name is jeff", a)
   return a
+
 };
 
 /**
@@ -33,6 +58,7 @@ export const encode = object => {
  *   base64 string -> Buffer -> JSON string -> object
  */
 export const decode = base64Str => {
+
   // var binary_string =  window.atob(base64Str);
   //     var len = binary_string.length;
   //     var bytes = new Uint8Array( len );
