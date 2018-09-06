@@ -2,6 +2,12 @@ import * as secp256k1 from 'secp256k1';
 import { randomBytes, createHash } from 'crypto';
 
 
+// Returns a Buffer SHA-256 hash of a string or Buffer
+const sha256 = msg => createHash('sha256').update(msg).digest();
+
+// Converts a hex string to a Buffer
+const toBytes = hex => Buffer.from(hex, 'hex');
+
 /**
  * This module is essentially identical to part-one's signing module.
  * Feel free to copy in your solution from there.
@@ -10,14 +16,12 @@ import { randomBytes, createHash } from 'crypto';
  * a 64 character hex string.
  */
 export const createPrivateKey = () => {
-  // Enter your solution here
-  let privKey;
+  let privateKey = null;
   do {
-    privKey = randomBytes(32);
-  } while (!secp256k1.privateKeyVerify(privKey));
-  return privKey.toString('hex');
-  // let privKey = randomBytes(32);
-  // return privKey;
+    privateKey = randomBytes(32);
+  } while (!secp256k1.privateKeyVerify(privateKey));
+
+  return privateKey.toString('hex');
 };
 
 /**
@@ -25,10 +29,7 @@ export const createPrivateKey = () => {
  * 66 character hexadecimal string.
  */
 export const getPublicKey = privateKey => {
-  // Your code here
-  const buf = Buffer.from(privateKey, 'hex');
-  return secp256k1.publicKeyCreate(buf).toString('hex');
-
+  return secp256k1.publicKeyCreate(toBytes(privateKey)).toString('hex');
 };
 
 /**
@@ -47,11 +48,9 @@ export const getPublicKey = privateKey => {
  *   // }
  */
 export const createKeys = () => {
-  // Your code here
-  let keys = {};
-  keys.privateKey = createPrivateKey();
-  keys.publicKey = getPublicKey(keys.privateKey);
-  return keys;
+  const privateKey = createPrivateKey();
+  const publicKey = getPublicKey(privateKey);
+  return { privateKey, publicKey };
 };
 
 /**
@@ -59,10 +58,6 @@ export const createKeys = () => {
  * hexadecimal signature.
  */
 export const sign = (privateKey, message) => {
-  // Your code here
-  var hash = createHash('sha256').update(message).digest();
-  const buf = Buffer.from(privateKey, 'hex');
-
-  let signature = secp256k1.sign(hash, buf);
-  return signature.signature.toString("hex");
+  const { signature } = secp256k1.sign(sha256(message), toBytes(privateKey));
+  return signature.toString('hex');
 };

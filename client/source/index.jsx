@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Home from './src/components/Home'
 
 ReactDOM.render((
   <BrowserRouter>
-    <h1>Hello, Cryptomoji!</h1>
+    <Switch>
+      <Route exact path='/' component={Home} />
+    </Switch>
   </BrowserRouter>
 ), document.getElementById('app'));
-

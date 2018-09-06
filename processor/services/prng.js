@@ -22,7 +22,8 @@ const getPrng = hex => {
   if (!seed) {
     seed = 1111111111;
   }
-
+  
+  console.log('seed ', seed);
   /**
    * This PRNG function takes an integer maximum and returns a pseudo-random
    * integer from 0 up to that maximum.

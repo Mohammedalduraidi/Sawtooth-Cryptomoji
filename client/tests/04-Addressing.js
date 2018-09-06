@@ -93,7 +93,7 @@ describe('Addressing module', function() {
 
   // Offers are a part of the extra credit portion of the sprint.
   // Remove the `.skip` to run these tests.
-  describe('getOfferAddress', function() {
+  describe.skip('getOfferAddress', function() {
     let publicKey = null;
     let keyHash = null;
     let dna = null;

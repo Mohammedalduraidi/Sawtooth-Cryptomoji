@@ -1,9 +1,25 @@
-// function toObject(arr) {
-//   var rv = {};
-//   for(var i = 0; i < arr.length; ++i)
-//     rv[i] = arr[i];
-//   return rv;
-// }
+// Maps over an array with a provided iterator function,
+// concatenating the resulting arrays
+const concatMap = (array, iterator) => {
+  return array.reduce((mapped, item) => {
+    return mapped.concat(iterator(item));
+  }, []);
+};
+
+// Recursively fetches all of the keys in nested objects
+const listKeys = object => {
+  if (!object || typeof object !== 'object') {
+    return [];
+  }
+
+  if (Array.isArray(object)) {
+    return concatMap(object, item => listKeys(item));
+  }
+
+  const topKeys = Object.keys(object);
+  const nestedKeys = concatMap(topKeys, key => listKeys(object[key]));
+  return topKeys.concat(nestedKeys);
+};
 
 /**
  * A function that takes an object and returns it encoded as a JSON Buffer.
@@ -21,9 +37,8 @@
  *   your object's keys or random transactions may fail.
  */
 export const encode = object => {
-  // Enter your solution here
-  var keys = Object.keys(object).sort();
-  return Buffer.from(JSON.stringify(object, keys));
+  const sortedKeys = listKeys(object).sort();
+  return Buffer.from(JSON.stringify(object, sortedKeys));
 };
 
 /**
@@ -36,11 +51,5 @@ export const encode = object => {
  *   base64 string -> Buffer -> JSON string -> object
  */
 export const decode = base64Str => {
-  // Your code here
-  var buf = Buffer.from(base64Str, 'base64'); 
-  var jsonStr = buf.toString();
-  var obj = JSON.parse(jsonStr);
-
-  return obj;
-
+  return JSON.parse(Buffer.from(base64Str, 'base64').toString());
 };
