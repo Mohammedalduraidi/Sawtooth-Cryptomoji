@@ -3,14 +3,15 @@
 const { TransactionHandler } = require('sawtooth-sdk/processor/handler');
 const { InvalidTransaction } = require('sawtooth-sdk/processor/exceptions');
 const { decode, encode } = require('./services/encoding');
+
 const { getCollectionAddress, getMojiAddress } = require('./services/addressing')
 const getPrng = require('./services/prng');
+
 const FAMILY_NAME = 'cryptomoji';
 const FAMILY_VERSION = '0.1';
 const NAMESPACE = '5f4d76';
 const GENE_SIZE = 2 ** (2 * 8);
 const emptyArray = size => Array.apply(null, Array(size));
-
 
 /**
 * A Cryptomoji specific version of a Hyperledger Sawtooth Transaction Handler.
@@ -49,6 +50,7 @@ class MojiHandler extends TransactionHandler {
    *   - context.deleteState(addresses): deletes the state for the passed
    *     array of state addresses. Only needed if attempting the extra credit.
    */
+
   makeDna(dna) {
     return emptyArray(9).map(() => {
       const randomHex = dna(GENE_SIZE).toString(16);
@@ -127,37 +129,49 @@ class MojiHandler extends TransactionHandler {
         moji: mojiAddress.sort()
       });
 
-
-
       return context.setState(update);
     });
   }
 
 
+  // createOwner(context, { name }, ownerPublicKey) {
+  //   const address = getSireAddress(ownerKey);
+  //   return context.getState([address]).then(state => {
+  //     if (state[address].length > 0) {
+  //       throw new InvalidTransaction('Owner already exist');
+  //     }
+  //     const update = {};
+  //     update[address] = encode({ key: ownerPublicKey, name });
+  //     return context.setState(update);
+  //   });
+  // }
 
 
   apply(txn, context) {
     let payload = null;
-    // console.log('txnnnnnnnnnn ',txn);
-    // console.log('context +++++',context);
-    // var x = context.getState();
-    // console.log('x ____ ',x);
     try {
       payload = decode(txn.payload);
-      // console.log('pay load ',payload);
     } catch (err) {
       throw new InvalidTransaction('Unable to decode payload');
     }
+    console.log('hellllllloooo world')
     if (payload.action === 'CREATE_COLLECTION') {
-      return this.createCollection(context, txn.header.signerPublicKey, txn.signature);
+      return this.createCollection(context, payload, txn.header.signerPublicKey);
     }
-    throw new InvalidTransaction('Unknown action');
+    // else if (payload.action === 'CREATE_OWNER') {
+    //   return createOwner(context, payload, txn.header.signerPublicKey);
+    // }
+
+    throw new InvalidTransaction(' Unknown action <3');
+
   }
 
-  // Enter your solution here
-  // (start by decoding your payload and checking which action it has)
 
 
+
+
+
+  
 }
 
 module.exports = MojiHandler;

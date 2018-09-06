@@ -5,8 +5,10 @@ import Home from './src/components/Home'
 
 ReactDOM.render((
   <BrowserRouter>
-    <Switch>
-      <Route exact path='/' component={Home} />
-    </Switch>
+
+  <Switch>
+  <Route exact path='/' component={Home} />
+  </Switch>
+
   </BrowserRouter>
 ), document.getElementById('app'));

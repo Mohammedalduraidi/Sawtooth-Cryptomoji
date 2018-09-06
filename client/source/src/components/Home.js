@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import axios from 'axios';
 import { createKeys, getPublicKey, createPrivateKey } from '../../services/signing';
@@ -56,11 +57,13 @@ export default class Home extends Component {
         })).catch(err => {
           console.log(err);
         });
+
   }
 
   render() {
     return (
       <div>
+
         <h1>your publicKey is :{this.state.publicKey}</h1>
         <hr />
         <button onClick={this.createCollection.bind(this)}>go</button>
@@ -69,3 +72,4 @@ export default class Home extends Component {
     );
   }
 }
+
